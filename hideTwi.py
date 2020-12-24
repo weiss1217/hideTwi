@@ -356,7 +356,6 @@ def save_hash_thread(hash):
         params = {"q": query, "count": 200}
 
         url = 'https://api.twitter.com/1.1/search/tweets.json'
-        self.get_AT()
         twitter = OAuth1Session(CK, CS, AT, ATS) #認証処理
         req = twitter.get(url, params=params)
 
