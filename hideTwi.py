@@ -349,7 +349,15 @@ def save_hash_thread(hash):
 
         hash = hash[1:]
 
-        save_dir = "./" + hash
+        if config.IMAGE_DIRECTORY == "":
+            save_dir = "./" + hash
+        else:
+            if not os.path.exists(config.IMAGE_DIRECTORY):
+                print("指定したディレクトリは存在しません。")
+                return
+            else:
+                save_dir = config.IMAGE_DIRECTORY + "\\" + hash
+
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
 
