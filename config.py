@@ -9,4 +9,4 @@ IMAGE_ALPHA = 0.5
 IMAGE_COLOR = "darkgray" # or "#a9a9a9"
 
 #フォントカラー
-PHONT_COLOR = "0x000000"
+PHONT_COLOR = "#000000"

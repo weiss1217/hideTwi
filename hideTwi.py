@@ -143,7 +143,7 @@ class MainWindow(QWidget):
 
         #メインウィンドウの設定
         self.w = 1280
-        self.h = 720
+        self.h = 260
         self.resize(self.w, self.h)
         self.setMinimumSize(self.w/2, self.h/2)
         self.widthFactor  = 1
