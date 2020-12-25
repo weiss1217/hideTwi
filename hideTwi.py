@@ -25,6 +25,7 @@ import webbrowser
 
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 import sip
 import ast
 
@@ -50,14 +51,36 @@ image_num = 0
 
 alpha_rate = config.MAIN_ALPHA
 image_alpha_rate = config.IMAGE_ALPHA
+tl_alpha_rate = config.TL_ALPHA
+
+class TLWindow(QWidget):
+    def __init__(self, parent=None):
+        super(TLWindow, self).__init__(parent)
+
+        #メインウィンドウの設定
+        self.w = 1280
+        self.h = 720
+        self.resize(self.w, self.h)
+        self.setMinimumSize(self.w/2, self.h/2)
+        self.widthFactor  = 1
+        self.heightFactor = 1
+        self.setWindowTitle('TL表示するよ')
+        self.setStyleSheet("background-color: " + config.IMAGE_COLOR + ";")
+        self.setWindowOpacity(tl_alpha_rate)
+
+        self.tl_display()
+
+    def tl_display():
+        pass
+
 
 class ImageWindow(QWidget):
     def __init__(self, parent=None):
         super(ImageWindow, self).__init__(parent)
 
         #メインウィンドウの設定
-        self.w = 1000
-        self.h = 480
+        self.w = 1150
+        self.h = 500
         self.resize(self.w, self.h)
         self.setMinimumSize(self.w/2, self.h/2)
         self.widthFactor  = 1
@@ -67,6 +90,7 @@ class ImageWindow(QWidget):
         self.setWindowOpacity(image_alpha_rate)
         self.label_list = []
         self.button_list = []
+        self.piclabel_list = []
         self.image_display()
 
     def image_display(self):
@@ -74,9 +98,9 @@ class ImageWindow(QWidget):
             return
 
         for i in range(len(image_list)):
-            #Tweetラベルの追加
+            #画像ラベルの追加
             self.label_list.append(QLabel(self))
-            self.label_list[i].move(50 , 40 * (i + 1))
+            self.label_list[i].move(50 , 120 * (i + 1) - 60)
             self.label_list[i].setText('<p><font size="4" color="' + config.PHONT_COLOR + '">' + image_list[i] + '</font></p>')
 
             #削除ボタンの追加
@@ -93,14 +117,23 @@ class ImageWindow(QWidget):
 
             self.button_list[i].resize(100, 30)
             self.button_list[i].setStyleSheet("background-color: #FFFFFF;")
-            self.button_list[i].move(900, 40 * (i + 1))
+            self.button_list[i].move(1030, 120 * (i + 1) - 60)
+
+            self.piclabel_list.append(QLabel(self))
+
+            pixmap = QPixmap(image_list[i])
+            pixmap2 = pixmap.scaled(100, 100)
+            self.piclabel_list[i].setPixmap(pixmap2)
+            self.piclabel_list[i].move(900,120 * (i + 1) - 100)
+
+
 
 
 
     def delete_image(self, index:int):
         global image_num
         global image_list
-        print(index)
+        #print(index)
 
         minus_index = 0
 
@@ -134,6 +167,7 @@ class ImageWindow(QWidget):
 
         self.label_list[index].hide()
         self.button_list[index].hide()
+        self.piclabel_list[index].hide()
 
         main_window.update_image_num()
 
@@ -255,6 +289,17 @@ class MainWindow(QWidget):
         self.savelbl.setVisible(False);
 
         self.progressChanged.connect(self.visible_hash)
+
+    def timeline_init(self):
+        # 保存ボタンの追加
+        self.TLbutton = QPushButton('TimeLine', self)
+        self.TLbutton.clicked.connect(self.timeline)
+        self.TLbutton.resize(100, 30)
+        self.TLbutton.setStyleSheet("background-color: #FFFFFF;")
+
+    def timeline(self):
+        timeline_window = TLWindow()
+        timeline_window.show()
 
     def visible_hash(self, count):
         self.savelbl.setText('<p><font size="4" color="' + config.PHONT_COLOR + '">保存件数 :' + str(count) + ' 件 </font></p>')

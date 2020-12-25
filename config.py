@@ -1,8 +1,11 @@
 #メインウィンドウ透過率
-MAIN_ALPHA = 0.5
+MAIN_ALPHA = 1.0
 
 #画像ウィンドウ透過率
-IMAGE_ALPHA = 0.5
+IMAGE_ALPHA = 1.0
+
+#TLウィンドウ透過率
+TL_ALPHA = 1.0
 
 #テーマカラー(color code 若しくは color name)
 #IMAGE_COLOR = "aliceblue" # or "#f0f8ff"
