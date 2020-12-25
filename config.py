@@ -10,3 +10,6 @@ IMAGE_COLOR = "darkgray" # or "#a9a9a9"
 
 #フォントカラー
 PHONT_COLOR = "#000000"
+
+#画像保存ディレクトリ
+IMAGE_DIRECTORY = "" # or "D:\hoge\huga\photo"
