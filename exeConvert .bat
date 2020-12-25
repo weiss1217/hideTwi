@@ -1,0 +1,1 @@
+pyinstaller hideTwi.py --onefile --noconsole --windowed
