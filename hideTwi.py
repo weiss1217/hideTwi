@@ -48,6 +48,9 @@ image_list = []
 delete_index = []
 image_num = 0
 
+alpha_rate = config.MAIN_ALPHA
+image_alpha_rate = config.IMAGE_ALPHA
+
 class ImageWindow(QWidget):
     def __init__(self, parent=None):
         super(ImageWindow, self).__init__(parent)
@@ -61,7 +64,7 @@ class ImageWindow(QWidget):
         self.heightFactor = 1
         self.setWindowTitle('画像一覧')
         self.setStyleSheet("background-color: " + config.IMAGE_COLOR + ";")
-        self.setWindowOpacity(config.IMAGE_ALPHA)
+        self.setWindowOpacity(image_alpha_rate)
         self.label_list = []
         self.button_list = []
         self.image_display()
@@ -135,6 +138,7 @@ class ImageWindow(QWidget):
         main_window.update_image_num()
 
 class MainWindow(QWidget):
+    progressChanged = pyqtSignal(int)
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
 
@@ -143,18 +147,23 @@ class MainWindow(QWidget):
 
         #メインウィンドウの設定
         self.w = 1280
-        self.h = 260
+        self.h = 300
         self.resize(self.w, self.h)
         self.setMinimumSize(self.w/2, self.h/2)
         self.widthFactor  = 1
         self.heightFactor = 1
         self.setWindowTitle('ついったーするやつ')
         self.setStyleSheet("background-color: " + config.IMAGE_COLOR + ";")
-        self.setWindowOpacity(config.MAIN_ALPHA)
+        self.setWindowOpacity(alpha_rate)
 
+        #ツイート関連の表示ウィジェットの設定
         self.tweet_init()
 
+        #ハッシュタグ保存機能の表示ウィジェットの設定
         self.hash_init()
+
+        #透過率変更機能ウィジェットの設定
+        self.alpha_change_init()
 
     def get_key(self):
         global CK
@@ -223,6 +232,11 @@ class MainWindow(QWidget):
         self.hashlbl.move(50, 170)
         self.hashlbl.setText('<p><font size="4" color="' + config.PHONT_COLOR + '">保存したい画像のハッシュタグを書けよ</font></p>')
 
+        #保存時ふぁぼ機能チェックボックスの追加
+        self.hashcheckbox = QCheckBox("ふぁぼりてぇCheckBox", self)
+        self.hashcheckbox.move(340, 170)
+        self.hashcheckbox.setChecked(False)
+
         # ハッシュタグTextBoxの追加
         self.hashbox = QLineEdit(self)
         self.hashbox.move(40, 200)
@@ -234,20 +248,51 @@ class MainWindow(QWidget):
         self.savebutton.resize(100, 30)
         self.savebutton.setStyleSheet("background-color: #FFFFFF;")
 
+        #保存件数表示ラベルの追加
+        self.savelbl = QLabel(self)
+        self.savelbl.move(50, 240)
+        self.savelbl.setText('<p><font size="4" color="' + config.PHONT_COLOR + '">保存件数 : </font></p>')
+        self.savelbl.setVisible(False);
+
+        self.progressChanged.connect(self.visible_hash)
+
+    def visible_hash(self, count):
+        self.savelbl.setText('<p><font size="4" color="' + config.PHONT_COLOR + '">保存件数 :' + str(count) + ' 件 </font></p>')
+        self.savelbl.setVisible(True);
+
+        t=threading.Thread(target=self.invisible_hash)
+        t.start()
+
+    def invisible_hash(self):
+        sleep(5)
+        self.savelbl.setVisible(False);
+
+    def alpha_change_init(self):
+        self.slider = QSlider(Qt.Horizontal, self)
+        self.slider.setFocusPolicy(Qt.NoFocus)
+        self.slider.valueChanged[int].connect(self.alpha_change)
+
+    def alpha_change(self, value):
+        global alpha_rate
+        alpha_rate = 0.2 + value / 100 * 0.8
+        image_alpha_rate = 0.2 + value / 100 * 0.8
+        self.setWindowOpacity(alpha_rate)
 
     def resizeEvent(self, event):
         self.widthFactor  = self.rect().width() / 1280
-        self.heightFactor = self.rect().height()/ 720
+        self.heightFactor = self.rect().height()/ 300
 
         #ツイート機能ウィジェットの自動調整
         self.textbox.resize(self.w*self.widthFactor*0.85, 70)
         self.tweetbutton.move(40 + 30 + self.w*self.widthFactor*0.85, 80)
         self.imagebutton.move(40 + 30 + self.w*self.widthFactor*0.85, 40)
 
-
         #ハッシュタグ機能ウィジェットの自動調整
         self.hashbox.resize(self.w*self.widthFactor*0.85,30)
         self.savebutton.move(40 + 30 + self.w*self.widthFactor*0.85,  200)
+
+        #透過率調整つまみの自動調整
+        self.slider.move(self.w*self.widthFactor - 130,  self.h*self.heightFactor - 40)
 
         super(MainWindow, self).resizeEvent(event)
 
@@ -336,14 +381,12 @@ class MainWindow(QWidget):
         twitter = OAuth1Session(CK, CS, AT, ATS)
         hash = self.hashbox.text()
         hash = hash.strip()
-        t=threading.Thread(target=save_hash_thread,args = (hash,))
+        t=threading.Thread(target=self.save_hash_thread,args = (hash,))
         t.start()
 
-
-
-def save_hash_thread(hash):
-    if hash[:1] != "#":
-        hash = "#" + hash
+    def save_hash_thread(self, hash):
+        if hash[:1] != "#":
+            hash = "#" + hash
 
         query = hash + ' filter:images min_faves:0 exclude:retweets'
 
@@ -364,7 +407,6 @@ def save_hash_thread(hash):
         params = {"q": query, "count": 200}
 
         url = 'https://api.twitter.com/1.1/search/tweets.json'
-        self.get_AT()
         twitter = OAuth1Session(CK, CS, AT, ATS) #認証処理
         req = twitter.get(url, params=params)
 
@@ -377,6 +419,7 @@ def save_hash_thread(hash):
             print("ERROR!: %d" % req.status_code)
             return;
 
+        save_count = 0
         for tweet in result:
             name = tweet['user']['screen_name']
             date = tweet['created_at']
@@ -397,13 +440,24 @@ def save_hash_thread(hash):
                         tweet_id = tweet["id"]
                         params = {"id": tweet_id}
                         #print("id取得" + str(tweet_id))
+                        if self.hashcheckbox.isChecked():
+                            res = twitter.post(url3, params=params) #ふぁぼ
+                            if res.status_code == 200: #正常投稿出来た場合
+                                print("Favorite Success.")
+                            else: #正常投稿出来なかった場合
+                                print("Failed. : %d"% res.status_code)
+
                         urlreq.urlretrieve(img_url, path)
                         print("画像を保存しました", img_url)
+                        save_count += 1
                     print("-・"*30)
             except Exception as e:
                 print("画像を取得できませんでした")
                 print(e)
                 print("-・"*30)
+
+        self.progressChanged.emit(save_count)
+
 
 if __name__ == '__main__':
 
