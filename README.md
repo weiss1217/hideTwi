@@ -1,9 +1,9 @@
-# ついったーするやつ(クソデカ文字)
+# �������[������(�N�\�f�J����)
 ## Abstract
-ついったーするやつです。更新頑張ります。
+�������[�����ł��B�X�V�撣��܂��B
 
 ## Environment
-python3.6以上
+python3.6�ȏ�
 
 ## Installation
 ```
@@ -16,21 +16,21 @@ python hideTwi.py
 ```
 
 ## configuration changes
-config.pyの中身を変更してください。
-現状では以下を変更できます。
+config.py�̒��g��ύX���Ă��������B
+����ł͈ȉ���ύX�ł��܂��B
 ```
-・テーマカラー
-・フォントカラー
-・透過率
-・画像保存ディレクトリ
+�E�e�[�}�J���[
+�E�t�H���g�J���[
+�E���ߗ�
+�E�摜�ۑ��f�B���N�g��
 ```
 
 ## HOW TO USE
-現状での機能は下記のみとなります。
+����ł̋@�\�͉��L�݂̂ƂȂ�܂��B
 ```
-・ツイート(画像付き)
-・ハッシュタグ自動保存
- テキストボックス内にハッシュタグを入力して保存を押すと最大200枚まで自動的に保存を行います。
- ふぁぼりてぇCheckBoxにチェックを入れると保存と同時にふぁぼります。
-・スライダによる画面透過率の変更
+�E�c�C�[�g(�摜�t��)
+�E�n�b�V���^�O�����ۑ�
+ �e�L�X�g�{�b�N�X���Ƀn�b�V���^�O����͂��ĕۑ��������ƍő�200���܂Ŏ����I�ɕۑ����s���܂��B
+ �ӂ��ڂ�Ă�CheckBox�Ƀ`�F�b�N������ƕۑ��Ɠ����ɂӂ��ڂ�܂��B
+�E�X���C�_�ɂ���ʓ��ߗ��̕ύX
 ```
