@@ -12,4 +12,4 @@ IMAGE_COLOR = "darkgray" # or "#a9a9a9"
 PHONT_COLOR = "#000000"
 
 #画像保存ディレクトリ
-IMAGE_DIRECTORY = "D:\Tools\ひでつい_認証\hideTwi\photo" # or "D:\hoge\huga\photo"
+IMAGE_DIRECTORY = "" # or "D:\hoge\huga\photo"
