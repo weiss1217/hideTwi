@@ -7,6 +7,9 @@ IMAGE_ALPHA = 1.0
 #TLウィンドウ透過率
 TL_ALPHA = 1.0
 
+#テーマウィンドウ透過率
+THEME_ALPHA = 1.0
+
 #テーマカラー(color code 若しくは color name)
 #IMAGE_COLOR = "aliceblue" # or "#f0f8ff"
 IMAGE_COLOR = "darkgray" # or "#a9a9a9"

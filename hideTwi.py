@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:        hideTwi
-# Purpose:
+# Purpose:     こっそりTwitterを楽しみたい、画像ハッシュタグの自動保存を行いたい方向け
 #
 # Author:      T
 #
@@ -52,6 +52,35 @@ image_num = 0
 alpha_rate = config.MAIN_ALPHA
 image_alpha_rate = config.IMAGE_ALPHA
 tl_alpha_rate = config.TL_ALPHA
+theme_alpha_rate = config.THEME_ALPHA
+image_color = config.IMAGE_COLOR
+
+
+class ThemeWindow(QWidget):
+    def __init__(self, parent=None):
+        super(ThemeWindow, self).__init__(parent)
+
+        #メインウィンドウの設定
+        self.w = 1280
+        self.h = 720
+        self.resize(self.w, self.h)
+        self.setMinimumSize(self.w/2, self.h/2)
+        self.widthFactor  = 1
+        self.heightFactor = 1
+        self.setWindowTitle('テーマ変更するよ')
+        self.setStyleSheet("background-color: " + image_color + ";")
+        self.setWindowOpacity(theme_alpha_rate)
+
+        self.theme_display()
+
+    def theme_display(self):
+        global image_color
+        # opening color dialog
+        color = QColorDialog.getColor()
+
+        image_color = color
+
+        main_window.update_theme_color()
 
 class TLWindow(QWidget):
     def __init__(self, parent=None):
@@ -65,12 +94,12 @@ class TLWindow(QWidget):
         self.widthFactor  = 1
         self.heightFactor = 1
         self.setWindowTitle('TL表示するよ')
-        self.setStyleSheet("background-color: " + config.IMAGE_COLOR + ";")
+        self.setStyleSheet("background-color: " + image_color + ";")
         self.setWindowOpacity(tl_alpha_rate)
 
         self.tl_display()
 
-    def tl_display():
+    def tl_display(self):
         pass
 
 
@@ -86,7 +115,7 @@ class ImageWindow(QWidget):
         self.widthFactor  = 1
         self.heightFactor = 1
         self.setWindowTitle('画像一覧')
-        self.setStyleSheet("background-color: " + config.IMAGE_COLOR + ";")
+        self.setStyleSheet("background-color: " + image_color + ";")
         self.setWindowOpacity(image_alpha_rate)
         self.label_list = []
         self.button_list = []
@@ -187,7 +216,7 @@ class MainWindow(QWidget):
         self.widthFactor  = 1
         self.heightFactor = 1
         self.setWindowTitle('ついったーするやつ')
-        self.setStyleSheet("background-color: " + config.IMAGE_COLOR + ";")
+        self.setStyleSheet("background-color: " + image_color + ";")
         self.setWindowOpacity(alpha_rate)
 
         #ツイート関連の表示ウィジェットの設定
@@ -198,6 +227,11 @@ class MainWindow(QWidget):
 
         #透過率変更機能ウィジェットの設定
         self.alpha_change_init()
+
+        #TL表示ボタンの設定
+        self.timeline_init()
+
+        self.menu_init()
 
     def get_key(self):
         global CK
@@ -297,6 +331,32 @@ class MainWindow(QWidget):
         self.TLbutton.resize(100, 30)
         self.TLbutton.setStyleSheet("background-color: #FFFFFF;")
 
+    def menu_init(self):
+        #メニューバーの作成
+        self.menubar = QMenuBar(self)
+
+        #Fileメニュ-の作成
+        self.fileMenu = self.menubar.addMenu('&File')
+
+        #Ctrl + Qで終了
+        self.exitAction = QAction('&Exit', self)
+        self.exitAction.setShortcut('Ctrl+Q')
+        self.exitAction.setStatusTip('Exit application')
+        self.exitAction.triggered.connect(qApp.quit)
+        self.fileMenu.addAction(self.exitAction)
+
+        #Ctrl + Qで終了
+        self.themeAction = QAction('&Configuration', self)
+        self.themeAction.setShortcut('Ctrl+W')
+        self.themeAction.setStatusTip('Theme color change')
+        self.themeAction.triggered.connect(self.configuration_window)
+        self.fileMenu.addAction(self.themeAction)
+
+    def configuration_window(self):
+        theme_window = ThemeWindow()
+        theme_window.show()
+
+
     def timeline(self):
         timeline_window = TLWindow()
         timeline_window.show()
@@ -338,6 +398,9 @@ class MainWindow(QWidget):
 
         #透過率調整つまみの自動調整
         self.slider.move(self.w*self.widthFactor - 130,  self.h*self.heightFactor - 40)
+
+        #TL表示ボタンの自動調整
+        self.TLbutton.move(20, self.h*self.heightFactor - 40)
 
         super(MainWindow, self).resizeEvent(event)
 
@@ -418,6 +481,8 @@ class MainWindow(QWidget):
 
     def update_image_num(self):
         self.imagelbl.setText('<p><font size="4" color="' + config.PHONT_COLOR + '">添付画像数 : ' + str(image_num) + '</font></p>')
+
+
 
 
     #ハッシュタグを自動保存する
