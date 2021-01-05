@@ -78,7 +78,7 @@ class ThemeWindow(QWidget):
         # opening color dialog
         color = QColorDialog.getColor()
 
-        image_color = color
+        image_color = color.name()
 
         main_window.update_theme_color()
 
@@ -261,12 +261,12 @@ class MainWindow(QWidget):
     def tweet_init(self):
         #Tweetラベルの追加
         self.lbl = QLabel(self)
-        self.lbl.move(50, 10)
+        self.lbl.move(50, 30)
         self.lbl.setText('<p><font size="4" color="' + config.PHONT_COLOR + '">呟く内容を書けよ</font></p>')
 
         # ツイートTextBoxの追加
         self.textbox = QTextEdit(self)
-        self.textbox.move(40, 40)
+        self.textbox.move(40, 60)
         self.textbox.setStyleSheet("background-color: #FFFFFF;")
 
         # ツイートボタンの追加
@@ -283,31 +283,31 @@ class MainWindow(QWidget):
 
         # 添付画像ラベルの追加
         self.imagelbl = QLabel(self)
-        self.imagelbl.move(50, 125)
+        self.imagelbl.move(50, 145)
         self.imagelbl.setText('<p><font size="4" color="' + config.PHONT_COLOR + '">添付画像数 : ' + str(image_num) + '</font></p>')
 
         # 画像一覧ボタンの追加
         self.listbutton = QPushButton('画像一覧', self)
         self.listbutton.clicked.connect(self.list_image)
         self.listbutton.resize(100, 30)
-        self.listbutton.move(180, 118)
+        self.listbutton.move(180, 138)
         self.listbutton.setStyleSheet("background-color: #FFFFFF;")
 
 
     def hash_init(self):
         #ハッシュタグラベルの追加
         self.hashlbl = QLabel(self)
-        self.hashlbl.move(50, 170)
+        self.hashlbl.move(50, 190)
         self.hashlbl.setText('<p><font size="4" color="' + config.PHONT_COLOR + '">保存したい画像のハッシュタグを書けよ</font></p>')
 
         #保存時ふぁぼ機能チェックボックスの追加
         self.hashcheckbox = QCheckBox("ふぁぼりてぇCheckBox", self)
-        self.hashcheckbox.move(340, 170)
+        self.hashcheckbox.move(340, 190)
         self.hashcheckbox.setChecked(False)
 
         # ハッシュタグTextBoxの追加
         self.hashbox = QLineEdit(self)
-        self.hashbox.move(40, 200)
+        self.hashbox.move(40, 220)
         self.hashbox.setStyleSheet("background-color: #FFFFFF;")
 
         # 保存ボタンの追加
@@ -318,7 +318,7 @@ class MainWindow(QWidget):
 
         #保存件数表示ラベルの追加
         self.savelbl = QLabel(self)
-        self.savelbl.move(50, 240)
+        self.savelbl.move(50, 260)
         self.savelbl.setText('<p><font size="4" color="' + config.PHONT_COLOR + '">保存件数 : </font></p>')
         self.savelbl.setVisible(False);
 
@@ -351,6 +351,10 @@ class MainWindow(QWidget):
         self.themeAction.setStatusTip('Theme color change')
         self.themeAction.triggered.connect(self.configuration_window)
         self.fileMenu.addAction(self.themeAction)
+
+    def update_theme_color(self):
+        #print(vars(image_color))
+        self.setStyleSheet("background-color: " + image_color + ";")
 
     def configuration_window(self):
         theme_window = ThemeWindow()
@@ -389,12 +393,12 @@ class MainWindow(QWidget):
 
         #ツイート機能ウィジェットの自動調整
         self.textbox.resize(self.w*self.widthFactor*0.85, 70)
-        self.tweetbutton.move(40 + 30 + self.w*self.widthFactor*0.85, 80)
-        self.imagebutton.move(40 + 30 + self.w*self.widthFactor*0.85, 40)
+        self.tweetbutton.move(40 + 30 + self.w*self.widthFactor*0.85, 100)
+        self.imagebutton.move(40 + 30 + self.w*self.widthFactor*0.85, 60)
 
         #ハッシュタグ機能ウィジェットの自動調整
         self.hashbox.resize(self.w*self.widthFactor*0.85,30)
-        self.savebutton.move(40 + 30 + self.w*self.widthFactor*0.85,  200)
+        self.savebutton.move(40 + 30 + self.w*self.widthFactor*0.85,  220)
 
         #透過率調整つまみの自動調整
         self.slider.move(self.w*self.widthFactor - 130,  self.h*self.heightFactor - 40)
