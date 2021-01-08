@@ -53,8 +53,15 @@ alpha_rate = config.MAIN_ALPHA
 image_alpha_rate = config.IMAGE_ALPHA
 tl_alpha_rate = config.TL_ALPHA
 theme_alpha_rate = config.THEME_ALPHA
-image_color = config.IMAGE_COLOR
+image_color = config.DEFAULT_IMAGE_COLOR
+phonto_color = config.DEFAULT_PHONT_COLOR
 
+if config.DEFAULT_THEME == "dark":
+    image_color = config.DARK_IMAGE_COLOR
+    phonto_color = config.DARK_PHONT_COLOR
+elif config.DEFAULT_THEME == "light":
+    image_color = config.LIGHT_IMAGE_COLOR
+    phonto_color = config.LIGHT_PHONT_COLOR
 
 class ThemeWindow(QWidget):
     def __init__(self, parent=None):
@@ -130,7 +137,7 @@ class ImageWindow(QWidget):
             #画像ラベルの追加
             self.label_list.append(QLabel(self))
             self.label_list[i].move(50 , 120 * (i + 1) - 60)
-            self.label_list[i].setText('<p><font size="4" color="' + config.PHONT_COLOR + '">' + image_list[i] + '</font></p>')
+            self.label_list[i].setText('<p><font size="4" color="' + phonto_color + '">' + image_list[i] + '</font></p>')
 
             #削除ボタンの追加
             self.button_list.append(QPushButton('削除', self))
@@ -154,10 +161,6 @@ class ImageWindow(QWidget):
             pixmap2 = pixmap.scaled(100, 100)
             self.piclabel_list[i].setPixmap(pixmap2)
             self.piclabel_list[i].move(900,120 * (i + 1) - 100)
-
-
-
-
 
     def delete_image(self, index:int):
         global image_num
@@ -207,6 +210,7 @@ class MainWindow(QWidget):
 
         self.get_key()
         self.oauth()
+        self.theme_status = config.DEFAULT_THEME
 
         #メインウィンドウの設定
         self.w = 1280
@@ -262,7 +266,7 @@ class MainWindow(QWidget):
         #Tweetラベルの追加
         self.lbl = QLabel(self)
         self.lbl.move(50, 30)
-        self.lbl.setText('<p><font size="4" color="' + config.PHONT_COLOR + '">呟く内容を書けよ</font></p>')
+        self.lbl.setText('<p><font size="4" color="' + phonto_color + '">呟く内容を書けよ</font></p>')
 
         # ツイートTextBoxの追加
         self.textbox = QTextEdit(self)
@@ -284,7 +288,7 @@ class MainWindow(QWidget):
         # 添付画像ラベルの追加
         self.imagelbl = QLabel(self)
         self.imagelbl.move(50, 145)
-        self.imagelbl.setText('<p><font size="4" color="' + config.PHONT_COLOR + '">添付画像数 : ' + str(image_num) + '</font></p>')
+        self.imagelbl.setText('<p><font size="4" color="' + phonto_color + '">添付画像数 : ' + str(image_num) + '</font></p>')
 
         # 画像一覧ボタンの追加
         self.listbutton = QPushButton('画像一覧', self)
@@ -298,7 +302,7 @@ class MainWindow(QWidget):
         #ハッシュタグラベルの追加
         self.hashlbl = QLabel(self)
         self.hashlbl.move(50, 190)
-        self.hashlbl.setText('<p><font size="4" color="' + config.PHONT_COLOR + '">保存したい画像のハッシュタグを書けよ</font></p>')
+        self.hashlbl.setText('<p><font size="4" color="' + phonto_color + '">保存したい画像のハッシュタグを書けよ</font></p>')
 
         #保存時ふぁぼ機能チェックボックスの追加
         self.hashcheckbox = QCheckBox("ふぁぼりてぇCheckBox", self)
@@ -319,7 +323,7 @@ class MainWindow(QWidget):
         #保存件数表示ラベルの追加
         self.savelbl = QLabel(self)
         self.savelbl.move(50, 260)
-        self.savelbl.setText('<p><font size="4" color="' + config.PHONT_COLOR + '">保存件数 : </font></p>')
+        self.savelbl.setText('<p><font size="4" color="' + phonto_color + '">保存件数 : </font></p>')
         self.savelbl.setVisible(False);
 
         self.progressChanged.connect(self.visible_hash)
@@ -345,12 +349,32 @@ class MainWindow(QWidget):
         self.exitAction.triggered.connect(qApp.quit)
         self.fileMenu.addAction(self.exitAction)
 
-        #Ctrl + Qで終了
-        self.themeAction = QAction('&Configuration', self)
-        self.themeAction.setShortcut('Ctrl+W')
-        self.themeAction.setStatusTip('Theme color change')
-        self.themeAction.triggered.connect(self.configuration_window)
-        self.fileMenu.addAction(self.themeAction)
+        #Ctrl + Wでテーマカラー変更
+        self.themeColorAction = QAction('&Configuration', self)
+        self.themeColorAction.setShortcut('Ctrl+W')
+        self.themeColorAction.setStatusTip('Theme color change')
+        self.themeColorAction.triggered.connect(self.configuration_window)
+        self.fileMenu.addAction(self.themeColorAction)
+
+        #テーマカラー変更
+        self.themeMenu = self.fileMenu.addMenu('&Theme Change')
+        self.themedefaultAction = QAction('&Default', self)
+        #self.themeAction.setShortcut('Ctrl+D')
+        self.themedefaultAction.setStatusTip('Theme change to default')
+        self.themedefaultAction.triggered.connect(self.theme_default_change)
+        self.themeMenu.addAction(self.themedefaultAction)
+
+        self.themelightAction = QAction('&light', self)
+        #self.themeAction.setShortcut('Ctrl+l')
+        self.themelightAction.setStatusTip('Theme change to light')
+        self.themelightAction.triggered.connect(self.theme_light_change)
+        self.themeMenu.addAction(self.themelightAction)
+
+        self.themedarkAction = QAction('&dark', self)
+        #self.themeAction.setShortcut('Ctrl+T')
+        self.themedarkAction.setStatusTip('Theme change to dark')
+        self.themedarkAction.triggered.connect(self.theme_dark_change)
+        self.themeMenu.addAction(self.themedarkAction)
 
     def update_theme_color(self):
         #print(vars(image_color))
@@ -360,13 +384,32 @@ class MainWindow(QWidget):
         theme_window = ThemeWindow()
         theme_window.show()
 
+    def theme_default_change(self):
+        image_color = config.DEFAULT_IMAGE_COLOR
+        phonto_color = config.DEFAULT_PHONT_COLOR
+        self.set_theme()
+
+    def theme_light_change(self):
+        image_color = config.LIGHT_IMAGE_COLOR
+        phonto_color = config.LIGHT_PHONT_COLOR
+        self.set_theme()
+
+    def theme_dark_change(self):
+        image_color = config.DARK_IMAGE_COLOR
+        phonto_color = config.DARK_PHONT_COLOR
+        self.set_theme()
+
+    def set_theme(self):
+        self.setStyleSheet("background-color: " + image_color + ";")
+        self.lbl.setText('<p><font size="4" color="' + ph + '">呟く内容を書けよ</font></p>')
+
 
     def timeline(self):
         timeline_window = TLWindow()
         timeline_window.show()
 
     def visible_hash(self, count):
-        self.savelbl.setText('<p><font size="4" color="' + config.PHONT_COLOR + '">保存件数 :' + str(count) + ' 件 </font></p>')
+        self.savelbl.setText('<p><font size="4" color="' + phonto_color + '">保存件数 :' + str(count) + ' 件 </font></p>')
         self.savelbl.setVisible(True);
 
         t=threading.Thread(target=self.invisible_hash)
@@ -474,17 +517,17 @@ class MainWindow(QWidget):
         if input_image_path != "":
             image_list.append(input_image_path)
             image_num += 1
-            self.imagelbl.setText('<p><font size="4" color="' + config.PHONT_COLOR + '">添付画像数 : ' + str(image_num) + '</font></p>')
+            self.imagelbl.setText('<p><font size="4" color="' + phonto_color + '">添付画像数 : ' + str(image_num) + '</font></p>')
 
             if image_num > 3:
-                self.imagelbl.setText('<p><font size="4" color="' + config.PHONT_COLOR + '">添付画像数 : ' + str(image_num) + ' (MAX) </font></p>')
+                self.imagelbl.setText('<p><font size="4" color="' + phonto_color + '">添付画像数 : ' + str(image_num) + ' (MAX) </font></p>')
 
     def list_image(self):
         image_window = ImageWindow()
         image_window.show()
 
     def update_image_num(self):
-        self.imagelbl.setText('<p><font size="4" color="' + config.PHONT_COLOR + '">添付画像数 : ' + str(image_num) + '</font></p>')
+        self.imagelbl.setText('<p><font size="4" color="' + phonto_color + '">添付画像数 : ' + str(image_num) + '</font></p>')
 
 
 
